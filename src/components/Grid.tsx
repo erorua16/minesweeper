@@ -9,12 +9,17 @@ interface GridType {
 const Grid : React.FC<{ difficulty: Difficulty }> = (props: { difficulty: Difficulty })  => {
     const [gridSize, setGridSize] = React.useState<number | null>();
     const [numBombs, setNumBombs] = React.useState<number | null>();
+    const [bombsIds, setBombsIds] = React.useState<string[]>([])
+
 
     React.useEffect(() => {
         setGridState()
-        console.log('grid', props.difficulty)
     }, [props.difficulty])
 
+    React.useEffect(() => {
+        setBombs()
+    },[gridSize,numBombs])
+    
     const setGridState = () => {
         switch (props.difficulty) {
           case Difficulty.easy:
@@ -40,16 +45,39 @@ const Grid : React.FC<{ difficulty: Difficulty }> = (props: { difficulty: Diffic
         }
       }
 
-    const renderGrid = () => {
+      const setBombs = () => {
+       if(gridSize && numBombs){
+        let numBombsPlaced = 0;
+        let bombCellIds: string[] = [];
+        while(numBombsPlaced < numBombs){
+            let randomRow = Math.floor(Math.random() * gridSize);
+            let randomCol = Math.floor(Math.random() * gridSize);
+            let cellId = `${randomRow}-${randomCol}`;
+            if(!bombCellIds.includes(cellId)){
+                bombCellIds.push(cellId);
+                numBombsPlaced++;
+            }
+        }
+        setBombsIds(bombCellIds);
+       }
+      }
+      
+      const renderGrid = () => {
         let grid = [];
-        if(gridSize){
+        if(gridSize && numBombs){
             for (let i = 0; i < gridSize; i++) {
                 let row = [];
                 for (let j = 0; j < gridSize; j++) {
-                  row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md" />);
+                    let cellId = `${i}-${j}`;
+                    if(bombsIds.includes(cellId)){
+                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"><i className="fa-solid fa-bomb"></i></div>);
+                    } else {
+                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"></div>);
+                    }
                 }
                 grid.push(<div key={i} className="grid-row flex flex-row[p">{row}</div>)
             }
+            
             return grid;
         }
     };
