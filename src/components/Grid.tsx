@@ -2,26 +2,24 @@ import React from "react";
 import { Difficulty } from "../types/difficulty";
 
 interface GridType {
-    size : number;
-    numBombs : number;
+    difficulty: Difficulty;
 }
 
-const Grid : React.FC<{ difficulty: Difficulty }> = (props: { difficulty: Difficulty })  => {
+const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
     const [gridSize, setGridSize] = React.useState<number | null>();
     const [numBombs, setNumBombs] = React.useState<number | null>();
     const [bombsIds, setBombsIds] = React.useState<string[]>([])
 
-
     React.useEffect(() => {
         setGridState()
-    }, [props.difficulty])
+    }, [difficulty])
 
     React.useEffect(() => {
         setBombs()
     },[gridSize,numBombs])
     
     const setGridState = () => {
-        switch (props.difficulty) {
+        switch (difficulty) {
           case Difficulty.easy:
             setGridSize(9);
             setNumBombs(10);
@@ -62,6 +60,14 @@ const Grid : React.FC<{ difficulty: Difficulty }> = (props: { difficulty: Diffic
        }
       }
       
+      const onClick = (cellId:string) => {
+        if (bombsIds.includes(cellId)){
+            console.log('boom')
+        }
+        else{
+            console.log('hi')
+        }
+      }
       const renderGrid = () => {
         let grid = [];
         if(gridSize && numBombs){
@@ -70,9 +76,9 @@ const Grid : React.FC<{ difficulty: Difficulty }> = (props: { difficulty: Diffic
                 for (let j = 0; j < gridSize; j++) {
                     let cellId = `${i}-${j}`;
                     if(bombsIds.includes(cellId)){
-                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"><i className="fa-solid fa-bomb"></i></div>);
+                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}><i className="fa-solid fa-bomb"></i></div>);
                     } else {
-                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"></div>);
+                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}></div>);
                     }
                 }
                 grid.push(<div key={i} className="grid-row flex flex-row[p">{row}</div>)
@@ -81,9 +87,9 @@ const Grid : React.FC<{ difficulty: Difficulty }> = (props: { difficulty: Diffic
             return grid;
         }
     };
-      return <div className="grid">
+      return <>
         {renderGrid()}
-    </div>
+    </>
 }
 
 export default Grid
