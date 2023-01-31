@@ -62,9 +62,13 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
       
       const onClick = (cellId:string) => {
         if (bombsIds.includes(cellId)){
+            //@TODO
+            //Add  gameover logic
             console.log('boom')
         }
         else{
+            //@TODO
+            //Add flip grid functions
             console.log('hi')
         }
       }
