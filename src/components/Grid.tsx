@@ -79,10 +79,16 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
                 let row = [];
                 for (let j = 0; j < gridSize; j++) {
                     let cellId = `${i}-${j}`;
+                    let count = 0;
+                    for (let x = -1; x <= 1; x++) {
+                        for (let y = -1; y <= 1; y++) {
+                            if (bombsIds.includes(`${i + x}-${j + y}`)) count++;
+                        }
+                    }
                     if(bombsIds.includes(cellId)){
                         row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}><i className="fa-solid fa-bomb"></i></div>);
                     } else {
-                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}></div>);
+                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}>{count > 0 ? count : ''}</div>);
                     }
                 }
                 grid.push(<div key={i} className="grid-row flex flex-row[p">{row}</div>)
