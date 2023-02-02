@@ -3,6 +3,7 @@ import React from "react";
 import Grid from "./Grid";
 import { Difficulty } from "../types/difficulty";
 import Timer from "./Timer";
+import WinModal from "./WinModal";
 
 const Board = () => {
 
@@ -57,6 +58,7 @@ const Board = () => {
         </div>
       </div>
       {difficulty && gameState ? <Grid difficulty={difficulty} /> : null}
+      {/* <WinModal gameState={gameState}></WinModal> */}
     </div>
   </>
 };
