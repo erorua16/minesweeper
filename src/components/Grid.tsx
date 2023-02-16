@@ -5,19 +5,28 @@ interface GridType {
     difficulty: Difficulty;
 }
 
+interface cellIds {
+    position : string,
+    value : string,
+    revealed : boolean
+}
+
 const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
+
     const [gridSize, setGridSize] = React.useState<number | null>();
     const [numBombs, setNumBombs] = React.useState<number | null>();
-    const [bombsIds, setBombsIds] = React.useState<string[]>([])
+    const [cellIds, setCellIds] = React.useState<cellIds[]>([]);
 
     React.useEffect(() => {
         setGridState()
     }, [difficulty])
 
-    React.useEffect(() => {
-        setBombs()
-    },[gridSize,numBombs])
-    
+    React.useEffect(()=>{
+        if(gridSize && numBombs){
+            setGrid()
+        }
+    }, [gridSize])
+
     const setGridState = () => {
         switch (difficulty) {
           case Difficulty.easy:
@@ -43,57 +52,121 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
         }
       }
 
-      const setBombs = () => {
-       if(gridSize && numBombs){
-        let numBombsPlaced = 0;
-        let bombCellIds: string[] = [];
-        while(numBombsPlaced < numBombs){
+    const handleFlip = (cellId: string) => {
+        const cell = cellIds.find((item) => item.position === cellId);
+
+        if (!cell || cell.revealed) {
+          return;
+        }
+      
+        if (cell.value === "bomb") {
+          console.log("boom boom");
+        }
+      
+        const newCellIds = [...cellIds];
+      
+        cell.revealed = true;
+      
+        if (cell.value === "0") {
+          flipNeighbors(cell, newCellIds);
+        }
+      
+        setCellIds(newCellIds);
+      };
+      
+      function getNeighborPositions(position: string): string[] {
+        const [row, col] = position.split('-').map(Number);
+        const positions = [];
+      
+        if(gridSize){
+            for (let i = row - 1; i <= row + 1; i++) {
+                for (let j = col - 1; j <= col + 1; j++) {
+                  if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && (i !== row || j !== col)) {
+                    positions.push(`${i}-${j}`);
+                  }
+                }
+              }
+        }
+      
+        return positions;
+      }
+
+      const flipNeighbors = (cell: any, newCellIds : cellIds[]) => {
+        const neighborPositions = getNeighborPositions(cell.position);
+        neighborPositions.forEach((position) => {
+          const neighborCell = newCellIds.find((item:cellIds) => item.position === position);
+          if (neighborCell && !neighborCell.revealed) {
+            neighborCell.revealed = true;
+            if (neighborCell.value === "0") {
+              flipNeighbors(neighborCell, newCellIds);
+            }
+          }
+        });
+      };
+
+    const setBombs = () => {
+        if (gridSize && numBombs) {
+            let numBombsPlaced = 0;
+            let bombCellIds: string[] = [];
+        
+            while (numBombsPlaced < numBombs) {
             let randomRow = Math.floor(Math.random() * gridSize);
             let randomCol = Math.floor(Math.random() * gridSize);
             let cellId = `${randomRow}-${randomCol}`;
-            if(!bombCellIds.includes(cellId)){
+            if (!bombCellIds.includes(cellId)) {
                 bombCellIds.push(cellId);
                 numBombsPlaced++;
             }
+            }
+            return bombCellIds;
         }
-        setBombsIds(bombCellIds);
-       }
-      }
-      
-      const onClick = (cellId:string) => {
-        if (bombsIds.includes(cellId)){
-            //@TODO
-            //Add  gameover logic
-            console.log('boom')
-        }
-        else{
-            //@TODO
-            //Add flip grid functions
-            console.log('hi')
-        }
-      }
-      const renderGrid = () => {
-        let grid = [];
+    }
+
+    const setGrid = () => {
         if(gridSize && numBombs){
+            let cellIds = [];
+            let bombCellIds = setBombs();
             for (let i = 0; i < gridSize; i++) {
-                let row = [];
                 for (let j = 0; j < gridSize; j++) {
                     let cellId = `${i}-${j}`;
-                    let count = 0;
+                    let count = 0
                     for (let x = -1; x <= 1; x++) {
                         for (let y = -1; y <= 1; y++) {
-                            if (bombsIds.includes(`${i + x}-${j + y}`)) count++;
+                          if (bombCellIds!.includes(`${i + x}-${j + y}`)) count++;
                         }
                     }
-                    if(bombsIds.includes(cellId)){
-                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}><i className="fa-solid fa-bomb"></i></div>);
-                    } else {
-                        row.push(<div key={`${i}-${j}`} className="grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center" onClick={() => onClick(cellId)}>{count > 0 ? count : ''}</div>);
+                    if(bombCellIds!.includes(cellId)){
+                        cellIds.push({position : cellId, value: "bomb", revealed : false});
+                    }else{
+                        cellIds.push({position : cellId, value: `${count}`, revealed : false});
+                    }
+                    
+                }
+            }
+            setCellIds(cellIds);
+        }
+    }
+      
+    const renderGrid = () => {
+        let grid = [];
+        const cellClassColor = " bg-indigo-700"
+        var cellClassEmpty = "grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"
+        if(gridSize && numBombs){
+            for(let i = 0; i < cellIds.length; i ++){
+                let row = []
+                for(let j = 0 ; j < cellIds.length; j++){
+                    let cellId = `${i}-${j}`;
+                    var cell = cellIds.find(item => item.position === cellId);
+                    if(cell && cell.position){
+                        if(cell.value === "bomb"){
+                            row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onClick={() => handleFlip(cellId)}>{cell.revealed ? <i className="fa-solid fa-bomb"></i> : null}</div>);
+                        } else {
+                            row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onClick={() => handleFlip(cellId)}>{parseInt(cell.value) > 0 && cell.revealed ? cell.value : null}</div>);
+                        }
                     }
                 }
-                grid.push(<div key={i} className="grid-row flex flex-row[p">{row}</div>)
+                grid.push(<div key={i} className="grid-row flex flex-row">{row}</div>)
             }
-            
             return grid;
         }
     };
