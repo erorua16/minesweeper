@@ -74,7 +74,7 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
         setCellIds(newCellIds);
       };
       
-      function getNeighborPositions(position: string): string[] {
+      const getNeighborPositions = (position: string): string[] => {
         const [row, col] = position.split('-').map(Number);
         const positions = [];
       
