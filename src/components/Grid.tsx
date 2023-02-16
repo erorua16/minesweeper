@@ -52,25 +52,57 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
         }
       }
 
-    const handleFlip = (cellId :string) => {
-        var cell = cellIds.find(item => item.position === cellId);
-        console.log(cellIds)
-        if(cell?.revealed){
-            return
-        }
+    const handleFlip = (cellId: string) => {
+        const cell = cellIds.find((item) => item.position === cellId);
 
-        if(cell?.value === "bomb"){
-            console.log('boom boom')
+        if (!cell || cell.revealed) {
+          return;
         }
-        setCellIds(cellIds =>
-            cellIds.map(cell => {
-                if (cell.position === cellId) {
-                return { ...cell, revealed: true };
+      
+        if (cell.value === "bomb") {
+          console.log("boom boom");
+        }
+      
+        const newCellIds = [...cellIds];
+      
+        cell.revealed = true;
+      
+        if (cell.value === "0") {
+          flipNeighbors(cell, newCellIds);
+        }
+      
+        setCellIds(newCellIds);
+      };
+      
+      function getNeighborPositions(position: string): string[] {
+        const [row, col] = position.split('-').map(Number);
+        const positions = [];
+      
+        if(gridSize){
+            for (let i = row - 1; i <= row + 1; i++) {
+                for (let j = col - 1; j <= col + 1; j++) {
+                  if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && (i !== row || j !== col)) {
+                    positions.push(`${i}-${j}`);
+                  }
                 }
-                return cell;
-            })
-        );
-    }
+              }
+        }
+      
+        return positions;
+      }
+
+      const flipNeighbors = (cell: any, newCellIds : cellIds[]) => {
+        const neighborPositions = getNeighborPositions(cell.position);
+        neighborPositions.forEach((position) => {
+          const neighborCell = newCellIds.find((item:cellIds) => item.position === position);
+          if (neighborCell && !neighborCell.revealed) {
+            neighborCell.revealed = true;
+            if (neighborCell.value === "0") {
+              flipNeighbors(neighborCell, newCellIds);
+            }
+          }
+        });
+      };
 
     const setBombs = () => {
         if (gridSize && numBombs) {
