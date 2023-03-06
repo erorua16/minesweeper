@@ -1,6 +1,10 @@
 import React from 'react';
 
-const Timer = () => {
+interface Props {
+  finalTime?: (a: number, b: number) => void;
+}
+
+const Timer = ({ finalTime }: Props) => {
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
 
@@ -11,19 +15,22 @@ const Timer = () => {
         setMinutes(minutes => minutes + 1);
         setSeconds(0);
       }
+
     }, 1000);
+    if (finalTime) finalTime(seconds, minutes);
+  
     return () => clearInterval(interval);
   }, [minutes, seconds]);
 
   return <>
     <div className="w-24 mx-1 p-2 bg-white text-indigo-700 rounded-lg">
-        <div className="font-mono leading-none" x-text="minutes">{minutes}</div>
-        <div className="font-mono uppercase text-sm leading-none">Minutes</div>
+      <div className="font-mono leading-none" x-text="minutes">{minutes}</div>
+      <div className="font-mono uppercase text-sm leading-none">Minutes</div>
     </div>
 
     <div className="w-24 mx-1 p-2 bg-white text-indigo-700 rounded-lg">
-        <div className="font-mono leading-none" x-text="seconds">{seconds}</div>
-        <div className="font-mono uppercase text-sm leading-none">Seconds</div>
+      <div className="font-mono leading-none" x-text="seconds">{seconds}</div>
+      <div className="font-mono uppercase text-sm leading-none">Seconds</div>
     </div>
   </>
 };

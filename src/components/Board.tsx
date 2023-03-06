@@ -3,16 +3,27 @@ import React from "react";
 import Grid from "./Grid";
 import { Difficulty } from "../types/difficulty";
 import Timer from "./Timer";
-
+import LeaderBoard from "./LeaderBoard";
 const Board = () => {
 
   const [difficulty, setDifficulty] = React.useState<Difficulty>()
+  const [finalTime, setFinalTime] = React.useState<{ seconds: number; minutes: number }>({
+    seconds: 0,
+    minutes: 0
+  })
+
+  const getFinalTimeOfGame = (seconds: number, minutes: number) => {
+    setFinalTime({
+      seconds: seconds,
+      minutes: minutes
+    })
+  }
 
   //@TODO
   //Make gamestate a context
-  const [gameState , setGameState] = React.useState<boolean>(false)
+  const [gameState, setGameState] = React.useState<boolean>(false)
 
-  const handleDifficultyChange = (event:any) => {
+  const handleDifficultyChange = (event: any) => {
     const value = event.target.value
     if (value === Difficulty.easy) {
       setDifficulty(Difficulty.easy)
@@ -33,11 +44,12 @@ const Board = () => {
   };
 
   const startGame = () => {
-    if(difficulty){
+    if (difficulty) {
       setGameState(true)
     }
   }
-  
+
+
   return <>
     <div className="flex flex-col">
       <div className="flex justify-between">
@@ -49,14 +61,14 @@ const Board = () => {
             <option value={Difficulty.medium}>Medium (22x22, 100 bombs)</option>
             <option value={Difficulty.hard}>Hard (30x30, 250 bombs)</option>
           </select>
-          <button onClick={() => {startGame()}} className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">Start Game</button>
-          {gameState ? <Timer/> : null}
+          <button onClick={() => { startGame() }} className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">Start Game</button>
+          {gameState ? <Timer finalTime={getFinalTimeOfGame} /> : null}
         </div>
-        <div>
-          <button className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">LeaderBoard</button>
-        </div>
+
       </div>
       {difficulty && gameState ? <Grid difficulty={difficulty} /> : null}
+       <LeaderBoard finalTime={finalTime} defaultDifficulty={difficulty}/>
+
     </div>
   </>
 };
