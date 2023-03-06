@@ -1,6 +1,6 @@
 import React from "react";
 import { Difficulty } from "../types/difficulty";
-
+import flag from "../flag.png"
 interface GridType {
     difficulty: Difficulty;
 }
@@ -8,7 +8,9 @@ interface GridType {
 interface cellIds {
     position : string,
     value : string,
-    revealed : boolean
+    revealed : boolean,
+    flag : boolean
+
 }
 
 const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
@@ -16,6 +18,7 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
     const [gridSize, setGridSize] = React.useState<number | null>();
     const [numBombs, setNumBombs] = React.useState<number | null>();
     const [cellIds, setCellIds] = React.useState<cellIds[]>([]);
+
 
     React.useEffect(() => {
         setGridState()
@@ -53,12 +56,12 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
       }
 
     const handleFlip = (cellId: string) => {
-        const cell = cellIds.find((item) => item.position === cellId);
 
-        if (!cell || cell.revealed) {
+        const cell = cellIds.find((item) => item.position === cellId);
+        if (!cell || cell.revealed || cell.flag) {
           return;
         }
-      
+
         if (cell.value === "bomb") {
           console.log("boom boom");
         }
@@ -70,7 +73,8 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
         if (cell.value === "0") {
           flipNeighbors(cell, newCellIds);
         }
-      
+       
+
         setCellIds(newCellIds);
       };
       
@@ -136,9 +140,9 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
                         }
                     }
                     if(bombCellIds!.includes(cellId)){
-                        cellIds.push({position : cellId, value: "bomb", revealed : false});
+                        cellIds.push({position : cellId, value: "bomb", revealed : false, flag:false});
                     }else{
-                        cellIds.push({position : cellId, value: `${count}`, revealed : false});
+                        cellIds.push({position : cellId, value: `${count}`, revealed : false, flag:false});
                     }
                     
                 }
@@ -146,6 +150,23 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
             setCellIds(cellIds);
         }
     }
+    function handleRightClickToDisplayFlag(event:any,cellId:string) {
+      event.preventDefault();
+      const cell = cellIds.find((item) => item.position === cellId);
+      if (!cell|| cell.revealed) {
+        return;
+      }
+      if (cell.flag === true) {
+        cell.flag = false
+        const newCellIds = [...cellIds];
+        setCellIds(newCellIds);
+      }else{
+        const newCellIds = [...cellIds];
+        cell.flag = true;
+        setCellIds(newCellIds);
+      }
+    }
+
       
     const renderGrid = () => {
         let grid = [];
@@ -159,9 +180,9 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
                     var cell = cellIds.find(item => item.position === cellId);
                     if(cell && cell.position){
                         if(cell.value === "bomb"){
-                            row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onClick={() => handleFlip(cellId)}>{cell.revealed ? <i className="fa-solid fa-bomb"></i> : null}</div>);
+                            row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
                         } else {
-                            row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onClick={() => handleFlip(cellId)}>{parseInt(cell.value) > 0 && cell.revealed ? cell.value : null}</div>);
+                            row.push(<div key={cell.position}  className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)} onClick={() => handleFlip(cellId)}> {!cell.flag? parseInt(cell.value) > 0 && cell.revealed ? cell.value : null:<img src={flag} alt="flag"  />}</div>);
                         }
                     }
                 }
