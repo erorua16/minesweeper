@@ -1,15 +1,13 @@
 import { normalize } from "path";
 import React from "react";
 import Grid from "./Grid";
-import { Difficulty } from "../types/difficulty";
+import { Difficulty, DifficultyContextType } from "../types/difficulty";
 import Timer from "./Timer";
 
-const Board = () => {
 
-  const [difficulty, setDifficulty] = React.useState<Difficulty>()
 
-  //@TODO
-  //Make gamestate a context
+const Board = ({DifficultyContext}:any) : React.ReactElement => {
+  const {difficulty, setDifficulty} = React.useContext<DifficultyContextType>(DifficultyContext)
   const [gameState , setGameState] = React.useState<boolean>(false)
 
   const handleDifficultyChange = (event:any) => {
@@ -35,6 +33,7 @@ const Board = () => {
   const startGame = () => {
     if(difficulty){
       setGameState(true)
+      console.log(difficulty)
     }
   }
   
