@@ -21,6 +21,7 @@ const LeaderBoard = ({ finalTime, defaultDifficulty }: Props) => {
     const value = event.target.value;
     switch (value) {
       case Difficulty.easy:
+        
         setLevel(Difficulty.easy);
         if (localStorage.getItem("minesweeper-easy")) {
           //localStorage.setItem("minesweeper-easy", JSON.stringify([enock]));
