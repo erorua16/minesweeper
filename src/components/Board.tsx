@@ -10,6 +10,17 @@ import LeaderBoard from "./LeaderBoard";
 const Board = ({DifficultyContext}:any) : React.ReactElement => {
   const {difficulty, setDifficulty} = React.useContext<DifficultyContextType>(DifficultyContext)
   const [gameState , setGameState] = React.useState<GameState>(GameState.notPlaying)
+  const [finalTime, setFinalTime] = React.useState<{ seconds: number; minutes: number }>({
+    seconds: 0,
+    minutes: 0
+  })
+
+  const getFinalTimeOfGame = (seconds: number, minutes: number) => {
+    setFinalTime({
+      seconds: seconds,
+      minutes: minutes
+    })
+  }
 
   const handleDifficultyChange = (event:any) => {
     const value = event.target.value
@@ -49,7 +60,7 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
             <option value={Difficulty.hard}>Hard (30x30, 250 bombs)</option>
           </select>
           <button onClick={() => {startGame()}} className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">Start Game</button>
-          {gameState !== GameState.notPlaying ? <Timer gameState={gameState}/> : null}
+          {gameState !== GameState.notPlaying ? <Timer finalTime={getFinalTimeOfGame} gameState={gameState}/> : null}
         </div>
         <div>
           <button className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">LeaderBoard</button>
