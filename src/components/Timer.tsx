@@ -3,7 +3,10 @@ import { GameState } from '../types/gameState';
 interface TimerType {
   gameState: GameState;
 }
-const Timer = ({gameState}:TimerType) => {
+interface Props {
+  finalTime?: (a: number, b: number) => void;
+}
+const Timer = ({gameState}:TimerType,{ finalTime }: Props) => {
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
   const gameStateRef = React.useRef(gameState);
@@ -22,6 +25,7 @@ const Timer = ({gameState}:TimerType) => {
         }
       }
     }, 1000);
+    if (finalTime) finalTime(seconds, minutes);
     return () => clearInterval(interval);
   }, [minutes, seconds]);
 
@@ -39,3 +43,4 @@ const Timer = ({gameState}:TimerType) => {
 };
 
 export default Timer;
+
