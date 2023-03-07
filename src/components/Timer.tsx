@@ -1,15 +1,25 @@
 import React from 'react';
-
-const Timer = () => {
+import { GameState } from '../types/gameState';
+interface TimerType {
+  gameState: GameState;
+}
+const Timer = ({gameState}:TimerType) => {
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
+  const gameStateRef = React.useRef(gameState);
+
+  React.useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setSeconds(seconds => seconds + 1);
-      if (seconds === 59) {
-        setMinutes(minutes => minutes + 1);
-        setSeconds(0);
+      if (gameStateRef.current !== GameState.win && gameStateRef.current !== GameState.lose) {
+        setSeconds(seconds => seconds + 1);
+        if (seconds === 59) {
+          setMinutes(minutes => minutes + 1);
+          setSeconds(0);
+        }
       }
     }, 1000);
     return () => clearInterval(interval);

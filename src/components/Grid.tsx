@@ -1,8 +1,11 @@
 import React from "react";
 import { Difficulty } from "../types/difficulty";
 import flag from "../flag.png"
+import { GameState } from "../types/gameState";
 interface GridType {
     difficulty: Difficulty;
+    gameState: GameState;
+    setGameState:any
 }
 
 interface cellIds {
@@ -13,7 +16,7 @@ interface cellIds {
 
 }
 
-const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
+const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : GridType)  => {
 
     const [gridSize, setGridSize] = React.useState<number | null>();
     const [numBombs, setNumBombs] = React.useState<number | null>();
@@ -58,12 +61,16 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
     const handleFlip = (cellId: string) => {
 
         const cell = cellIds.find((item) => item.position === cellId);
+
         if (!cell || cell.revealed || cell.flag) {
           return;
         }
 
         if (cell.value === "bomb") {
+          setGameState(GameState.lose)
+          setCellIds(cellIds.map(cell => ({ ...cell, revealed: true })));
           console.log("boom boom");
+          return
         }
       
         const newCellIds = [...cellIds];
@@ -78,7 +85,7 @@ const Grid : React.FC<GridType> = ({ difficulty } : GridType)  => {
         setCellIds(newCellIds);
       };
       
-      function getNeighborPositions(position: string): string[] {
+      const getNeighborPositions = (position: string): string[] => {
         const [row, col] = position.split('-').map(Number);
         const positions = [];
       
