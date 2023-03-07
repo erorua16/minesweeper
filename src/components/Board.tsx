@@ -1,4 +1,3 @@
-import { normalize } from "path";
 import React from "react";
 import Grid from "./Grid";
 import { Difficulty, DifficultyContextType } from "../types/difficulty";

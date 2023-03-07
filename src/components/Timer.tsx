@@ -2,11 +2,10 @@ import React from 'react';
 import { GameState } from '../types/gameState';
 interface TimerType {
   gameState: GameState;
-}
-interface Props {
   finalTime?: (a: number, b: number) => void;
 }
-const Timer = ({gameState}:TimerType,{ finalTime }: Props) => {
+
+const Timer = ({ finalTime,gameState}:TimerType) => {
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
   const gameStateRef = React.useRef(gameState);
