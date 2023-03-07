@@ -2,6 +2,7 @@ import React from "react";
 import { Difficulty } from "../types/difficulty";
 import flag from "../flag.png"
 import { GameState } from "../types/gameState";
+import { createIndexSignature } from "typescript";
 interface GridType {
     difficulty: Difficulty;
     gameState: GameState;
@@ -57,19 +58,15 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
             break;
         }
       }
-
     const handleFlip = (cellId: string) => {
-
         const cell = cellIds.find((item) => item.position === cellId);
-
         if (!cell || cell.revealed || cell.flag) {
           return;
         }
 
         if (cell.value === "bomb") {
           setGameState(GameState.lose)
-          setCellIds(cellIds.map(cell => ({ ...cell, revealed: true })));
-          console.log("boom boom");
+          setCellIds(cellIds.map(cell => ({ ...cell, revealed: true, flag:false })));
           return
         }
       
@@ -83,6 +80,8 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
        
 
         setCellIds(newCellIds);
+        checkIfUserWin()
+
       };
       
       const getNeighborPositions = (position: string): string[] => {
@@ -173,7 +172,11 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
         setCellIds(newCellIds);
       }
     }
-
+    const checkIfUserWin=()=>{
+     const restOfBombs = cellIds.filter((item)=>item.revealed===false)
+     if(numBombs && restOfBombs.length === numBombs)
+        setGameState(GameState.win)  
+    }
       
     const renderGrid = () => {
         let grid = [];
