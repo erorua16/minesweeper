@@ -5,6 +5,7 @@ import { Difficulty, DifficultyContextType } from "../types/difficulty";
 import Timer from "./Timer";
 import { GameState } from "../types/gameState";
 import GameEndModal from "./GameEndModal";
+import LeaderBoard from "./LeaderBoard";
 
 const Board = ({DifficultyContext}:any) : React.ReactElement => {
   const {difficulty, setDifficulty} = React.useContext<DifficultyContextType>(DifficultyContext)
@@ -56,6 +57,8 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
       </div>
       {difficulty && gameState !== GameState.notPlaying ? <Grid difficulty={difficulty} gameState={gameState} setGameState={setGameState} /> : null}
       {gameState === GameState.lose || gameState === GameState.win ? <GameEndModal gameState={gameState}/> : null}
+      <LeaderBoard finalTime={finalTime} defaultDifficulty={difficulty}/>
+
     </div>
   </>
 };
