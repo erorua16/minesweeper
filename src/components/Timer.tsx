@@ -6,15 +6,10 @@ interface TimerType {
 const Timer = ({gameState}:TimerType) => {
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
-  const gameStateRef = React.useRef(gameState);
-
-  React.useEffect(() => {
-    gameStateRef.current = gameState;
-  }, [gameState]);
 
   React.useEffect(() => {
     const interval = setInterval(() => {
-      if (gameStateRef.current !== GameState.win && gameStateRef.current !== GameState.lose) {
+      if (gameState !== GameState.win && gameState !== GameState.lose) {
         setSeconds(seconds => seconds + 1);
         if (seconds === 59) {
           setMinutes(minutes => minutes + 1);
