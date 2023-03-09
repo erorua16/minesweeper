@@ -1,14 +1,30 @@
-import { normalize } from "path";
 import React from "react";
 import Grid from "./Grid";
 import { Difficulty, DifficultyContextType } from "../types/difficulty";
 import Timer from "./Timer";
 import { GameState } from "../types/gameState";
 import GameEndModal from "./GameEndModal";
+import LeaderBoard from "./LeaderBoard";
 
 const Board = ({DifficultyContext}:any) : React.ReactElement => {
   const {difficulty, setDifficulty} = React.useContext<DifficultyContextType>(DifficultyContext)
   const [gameState , setGameState] = React.useState<GameState>(GameState.notPlaying)
+  const [userName , setUsename] = React.useState<String>("")
+
+  const [finalTime, setFinalTime] = React.useState<{ seconds: number; minutes: number }>({
+    seconds: 0,
+    minutes: 0
+  })
+
+  const getFinalTimeOfGame = (seconds: number, minutes: number) => {
+    setFinalTime({
+      seconds: seconds,
+      minutes: minutes
+    })
+  }
+  const getUserName= (username:string) => {
+    setUsename(username)
+  }
 
   const handleDifficultyChange = (event:any) => {
     const value = event.target.value
@@ -48,14 +64,16 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
             <option value={Difficulty.hard}>Hard (30x30, 250 bombs)</option>
           </select>
           <button onClick={() => {startGame()}} className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">Start Game</button>
-          {gameState !== GameState.notPlaying ? <Timer gameState={gameState}/> : null}
+          {gameState !== GameState.notPlaying ? <Timer finalTime={getFinalTimeOfGame} gameState={gameState}/> : null}
         </div>
         <div>
           <button className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">LeaderBoard</button>
         </div>
       </div>
       {difficulty && gameState !== GameState.notPlaying ? <Grid difficulty={difficulty} gameState={gameState} setGameState={setGameState} /> : null}
-      {gameState === GameState.lose || gameState === GameState.win ? <GameEndModal gameState={gameState}/> : null}
+      {gameState === GameState.lose || gameState === GameState.win ? <GameEndModal getUserName={getUserName} gameState={gameState}/> : null}
+      <LeaderBoard userName={userName.toString()} finalTime={finalTime} defaultDifficulty={difficulty} gameState={gameState}/>
+
     </div>
   </>
 };

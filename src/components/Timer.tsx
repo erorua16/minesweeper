@@ -2,8 +2,10 @@ import React from 'react';
 import { GameState } from '../types/gameState';
 interface TimerType {
   gameState: GameState;
+  finalTime?: (a: number, b: number) => void;
 }
-const Timer = ({gameState}:TimerType) => {
+
+const Timer = ({ finalTime,gameState}:TimerType) => {
   const [minutes, setMinutes] = React.useState(0);
   const [seconds, setSeconds] = React.useState(0);
 
@@ -17,6 +19,7 @@ const Timer = ({gameState}:TimerType) => {
         }
       }
     }, 1000);
+    if (finalTime) finalTime(seconds, minutes);
     return () => clearInterval(interval);
   }, [minutes, seconds]);
 
@@ -34,3 +37,4 @@ const Timer = ({gameState}:TimerType) => {
 };
 
 export default Timer;
+
