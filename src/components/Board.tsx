@@ -9,6 +9,8 @@ import LeaderBoard from "./LeaderBoard";
 const Board = ({DifficultyContext}:any) : React.ReactElement => {
   const {difficulty, setDifficulty} = React.useContext<DifficultyContextType>(DifficultyContext)
   const [gameState , setGameState] = React.useState<GameState>(GameState.notPlaying)
+  const [userName , setUsename] = React.useState<String>("")
+
   const [finalTime, setFinalTime] = React.useState<{ seconds: number; minutes: number }>({
     seconds: 0,
     minutes: 0
@@ -19,6 +21,9 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
       seconds: seconds,
       minutes: minutes
     })
+  }
+  const getUserName= (username:string) => {
+    setUsename(username)
   }
 
   const handleDifficultyChange = (event:any) => {
@@ -66,8 +71,8 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
         </div>
       </div>
       {difficulty && gameState !== GameState.notPlaying ? <Grid difficulty={difficulty} gameState={gameState} setGameState={setGameState} /> : null}
-      {gameState === GameState.lose || gameState === GameState.win ? <GameEndModal gameState={gameState}/> : null}
-      <LeaderBoard finalTime={finalTime} defaultDifficulty={difficulty}/>
+      {gameState === GameState.lose || gameState === GameState.win ? <GameEndModal getUserName={getUserName} gameState={gameState}/> : null}
+      <LeaderBoard userName={userName.toString()} finalTime={finalTime} defaultDifficulty={difficulty} gameState={gameState}/>
 
     </div>
   </>

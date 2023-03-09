@@ -1,8 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Board from './components/Board';
 import { Difficulty, DifficultyContextType } from './types/difficulty';
+import { StateProvider } from './reducer/AppProvider';
 
 const DifficultyContext = React.createContext<DifficultyContextType | null>(null);
 
@@ -12,9 +12,11 @@ function App() {
   
   return (
     <DifficultyContext.Provider value={value}>
+      <StateProvider>
       <div className="m-10">
         <Board DifficultyContext={DifficultyContext}/>
       </div>
+      </StateProvider>
     </DifficultyContext.Provider>
   );
 }

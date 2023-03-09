@@ -1,72 +1,131 @@
 import React from "react";
 import moment from "moment";
-
+import { GameState } from "../types/gameState";
 import { Difficulty } from "../types/difficulty";
+import { appProvider } from "../reducer/AppProvider";
+import Utils from "../service/Utils";
+import { finalTimeType } from "../types/leaderBoard";
 
 interface Props {
-  finalTime: {
-    seconds: number;
-    minutes: number;
-  };
-  defaultDifficulty?: string;
+  finalTime: finalTimeType,
+  gameState: GameState;
+  userName: string;
+  defaultDifficulty: Difficulty;
+}
+interface userType {
+  name: string;
+  date: Date;
+  finalTime: finalTimeType;
+  level: Difficulty;
 }
 
-const LeaderBoard = ({ finalTime, defaultDifficulty }: Props) => {
+const LeaderBoard = ({
+  finalTime,
+  defaultDifficulty,
+  userName,
+  gameState,
+}: Props) => {
+  const { dispatch, state } = React.useContext(appProvider);
   const [level, setLevel] = React.useState<Difficulty>();
   const [playerList, setPlayerList] = React.useState([]);
-  console.log(playerList, "PlayerListparsed");
-
+  Utils.GetUsersInLocalStorage();
+  const playingUSer: userType = {
+    name: userName,
+    date: new Date(),
+    finalTime: finalTime,
+    level: defaultDifficulty,
+  };
+ const arr = [
+    { minutes: 2, seconds: 30 },
+    { minutes: 1, seconds: 45 },
+    { minutes: 3, seconds: 10 }
+  ];
+  const sortBySecondsAndMinutes=(arr:string[])=>{
+    arr.sort((a:any, b:any) => {
+      if (a.minutes === b.minutes) {
+        return a.seconds - b.seconds;
+      }
+      return a.minutes - b.minutes;
+    });
+  }
   
+
   const handleLevelChange = (event: any) => {
     const value = event.target.value;
     switch (value) {
       case Difficulty.easy:
-        
-        setLevel(Difficulty.easy);
-        if (localStorage.getItem("minesweeper-easy")) {
-          //localStorage.setItem("minesweeper-easy", JSON.stringify([enock]));
-          const players: any = localStorage.getItem("minesweeper-easy");
-          const playersParsed = JSON.parse(players);
-
-          //localStorage.settem("minesweeper-easy", JSON.stringify([enock]));
-          setPlayerList(playersParsed);
-          // setPlayerListParsed(JSON.parse(playerList))
-        }
-
-        console.log("easy");
+        const easy: any = state.user_level.easy;
+        setPlayerList(easy);
         break;
       case Difficulty.normal:
-        setLevel(Difficulty.normal);
-        let loc: any = localStorage.getItem("name");
-        let locPars = JSON.parse(loc)? JSON.parse(loc):[];
-
-        locPars.push(enock);
-        console.log(locPars);
-        console.log("normal");
+        const normal: any = state.user_level.normal;
+        setPlayerList(normal);
         break;
       case Difficulty.medium:
-        setLevel(Difficulty.medium);
-        setPlayerList([]);
-
-        console.log("medium");
+        const medium: any = state.user_level.medium;
+        setPlayerList(medium);
         break;
       case Difficulty.hard:
-        setLevel(Difficulty.hard);
-        setPlayerList([]);
-
-        console.log("hard");
+        const hard: any = state.user_level.hard;
+        setPlayerList(hard);
         break;
       default:
         setLevel(Difficulty.default);
     }
   };
 
-  const enock = {
-    name: "papa",
-    date: new Date(),
-    finalTime: finalTime,
-    level: "easy",
+  const setItemAndDispatch = (parsedUserWithLevel: string[]) => {
+    dispatch({ type: "SET_USER_LEVEL", payload: parsedUserWithLevel });
+    localStorage.setItem("minesweeper", JSON.stringify(parsedUserWithLevel));
   };
+
+  const addUserInLocalStorage = () => {
+    let userWithLevel: any = localStorage.getItem("minesweeper");
+    let parsedUserWithLevel = JSON.parse(userWithLevel)
+      ? JSON.parse(userWithLevel)
+      : null;
+    if (parsedUserWithLevel) {
+      console.log(parsedUserWithLevel.easy.length, "parsedUserWithLevel");
+      let level = state.user.level;
+      switch (level) {
+        case Difficulty.easy:
+          console.log(state.user_level.easy.length, "parsedUserWithLevel easy");
+          if (playingUSer.name.length > 0) {
+            parsedUserWithLevel.easy.push(playingUSer);
+            setItemAndDispatch(parsedUserWithLevel);
+          }
+          break;
+        case Difficulty.normal:
+          if (playingUSer.name.length > 0) {
+            parsedUserWithLevel.normal.push(playingUSer);
+            setItemAndDispatch(parsedUserWithLevel);
+          }
+          break;
+        case Difficulty.medium:
+          if (playingUSer.name.length > 0) {
+            parsedUserWithLevel.medium.push(playingUSer);
+            setItemAndDispatch(parsedUserWithLevel);
+          }
+          break;
+        case Difficulty.hard:
+          if (playingUSer.name.length > 0) {
+            parsedUserWithLevel.hard.push(playingUSer);
+            setItemAndDispatch(parsedUserWithLevel);
+          }
+          break;
+        default:
+      }
+    }
+  };
+  React.useEffect(() => {
+    if (gameState === GameState.win) {
+      dispatch({ type: "SET_USER", payload: playingUSer });
+    }
+  }, [gameState]);
+  React.useEffect(() => {
+    dispatch({ type: "SET_USER", payload: playingUSer });
+    addUserInLocalStorage();
+  }, [userName]);
 
   return (
     <>
@@ -121,8 +180,8 @@ const LeaderBoard = ({ finalTime, defaultDifficulty }: Props) => {
                   </thead>
                   <tbody className="text-sm divide-y divide-gray-100">
                     {playerList &&
-                      playerList.map((player: any, id) => (
-                        <tr key={id}>
+                      playerList.map((player: any, i: any) => (
+                        <tr key={i}>
                           <td className="p-2 whitespace-nowrap">
                             <div className="flex items-center">
                               <div className="font-medium text-gray-800">
