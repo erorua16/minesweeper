@@ -66,9 +66,6 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
           <button onClick={() => {startGame()}} className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">Start Game</button>
           {gameState !== GameState.notPlaying ? <Timer finalTime={getFinalTimeOfGame} gameState={gameState}/> : null}
         </div>
-        <div>
-          <button className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">LeaderBoard</button>
-        </div>
       </div>
       {difficulty && gameState !== GameState.notPlaying ? <Grid difficulty={difficulty} gameState={gameState} setGameState={setGameState} /> : null}
       {gameState === GameState.lose || gameState === GameState.win ? <GameEndModal getUserName={getUserName} gameState={gameState}/> : null}

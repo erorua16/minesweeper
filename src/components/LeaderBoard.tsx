@@ -35,21 +35,7 @@ const LeaderBoard = ({
     finalTime: finalTime,
     level: defaultDifficulty,
   };
- const arr = [
-    { minutes: 2, seconds: 30 },
-    { minutes: 1, seconds: 45 },
-    { minutes: 3, seconds: 10 }
-  ];
-  const sortBySecondsAndMinutes=(arr:string[])=>{
-    arr.sort((a:any, b:any) => {
-      if (a.minutes === b.minutes) {
-        return a.seconds - b.seconds;
-      }
-      return a.minutes - b.minutes;
-    });
-  }
-  
-
+ 
   const handleLevelChange = (event: any) => {
     const value = event.target.value;
     switch (value) {
@@ -127,11 +113,6 @@ const LeaderBoard = ({
 
   return (
     <>
-      <div>
-        <button className="h-10 px-5 m-2 text-indigo-100 transition-colors duration-150 bg-indigo-700 rounded-lg focus:shadow-outline hover:bg-indigo-800">
-          LeaderBoard
-        </button>
-      </div>
       <div className="flex flex-col">
         <h1 className="text-2xl font-semibold	">
           Select the level of Leader board
