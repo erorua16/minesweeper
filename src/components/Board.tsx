@@ -57,7 +57,7 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
   
   return <>
     <div className="grid place-content-center">
-      <h1 className="text-center  font-black text-4xl">Demineur</h1>
+      <h1 className="text-center  font-black text-4xl">Minesweeper</h1>
       <div className="grid mb-10">
         <div className="flex  justify-between items-center">
           <div className="flex items-center">
