@@ -210,7 +210,7 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
             var cell = cellIds.find(item => item.position === cellId);
             if(cell && cell.position){
               if(cell.value === "bomb"){
-                row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
+                row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor } onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
               } else {
                 row.push(<div key={cell.position}  className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)} onClick={() => handleFlip(cellId)}> {!cell.flag? parseInt(cell.value) > 0 && cell.revealed ? cell.value : null:<img src={flag} alt="flag"  />}</div>);
               }
@@ -218,7 +218,11 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
           }
           grid.push(<div key={i} className="grid-row flex flex-row">{row}</div>)
         }
-        return grid;
+        return (
+          <div className="flex justify-center">
+            <div className="grid">{grid}</div>
+          </div>
+        );
       }
     };
     
