@@ -1,5 +1,6 @@
 import React from 'react';
 import { GameState } from '../types/gameState';
+
 interface TimerType {
   gameState: GameState;
   finalTime?: (a: number, b: number) => void;
@@ -15,12 +16,11 @@ const Timer = ({ finalTime, gameState }: TimerType) => {
         setTime(time => time + 1);
       }, 1000);
     }
+    
+    if (finalTime) finalTime(seconds, minutes);
+    
     return () => clearInterval(interval);
   }, [gameState]);
-
-  React.useEffect(() => {
-    if (finalTime) finalTime(Math.floor(time / 60), time % 60);
-  }, [finalTime, time]);
 
   React.useEffect(() => {
     if (gameState === GameState.win || gameState === GameState.lose) {
