@@ -40,6 +40,7 @@ const GameEndModal: React.FC<GameEndModalType> = ({
   const handleSubmit=(e:any)=>{
     e.preventDefault()
     getUserName(userName.toString())
+    setState(false);
   }
   return (
     <>
