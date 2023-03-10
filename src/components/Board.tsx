@@ -40,14 +40,11 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
     } else if (value === Difficulty.hard) {
       setDifficulty(Difficulty.hard);
       setGameState(GameState.notPlaying)
-    } else {
-      setDifficulty(Difficulty.default);
-      setGameState(GameState.notPlaying)
     }
   };
 
   const startGame = () => {
-    if(difficulty !== Difficulty.default){
+    if(difficulty){
       setGameState(GameState.playing)
     }
     else {
@@ -62,7 +59,6 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
         <div className="flex  justify-between items-center">
           <div className="flex items-center">
             <select value={difficulty} onChange={handleDifficultyChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 my-5">
-              <option value={Difficulty.default}></option>
               <option value={Difficulty.easy}>Easy (9x9, 10 bombs)</option>
               <option value={Difficulty.normal}>Normal (16x16, 40 bombs)</option>
               <option value={Difficulty.medium}>Medium (22x22, 100 bombs)</option>

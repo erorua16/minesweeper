@@ -7,7 +7,7 @@ import { StateProvider } from './reducer/AppProvider';
 const DifficultyContext = React.createContext<DifficultyContextType | null>(null);
 
 function App() {
-  const [difficulty, setDifficulty] = React.useState(Difficulty.default);
+  const [difficulty, setDifficulty] = React.useState(Difficulty.easy);
   const value = React.useMemo(() => ({ difficulty, setDifficulty }), [difficulty]);
   
   return (
