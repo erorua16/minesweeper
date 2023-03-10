@@ -2,7 +2,7 @@ import React from "react";
 import { Difficulty } from "../types/difficulty";
 import flag from "../flag.png"
 import { GameState } from "../types/gameState";
-import { createIndexSignature } from "typescript";
+
 interface GridType {
     difficulty: Difficulty;
     gameState: GameState;
@@ -29,14 +29,14 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
         setMakeGrid(true)
         setGridState()
       }
-    }, [gameState])
+    }, [setGameState])
     
     React.useEffect(()=>{
         if(makeGrid){
           setGrid()
           setMakeGrid(false)
         }
-    }, [makeGrid])
+    }, [setMakeGrid, gridSize, numBombs])
 
     const setGridState = () => {
         switch (difficulty) {
@@ -88,78 +88,93 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
 
       };
       
-    const getNeighborPositions = (position: string): string[] => {
-      const [row, col] = position.split('-').map(Number);
-      const positions = [];
-    
-      if(gridSize){
-          for (let i = row - 1; i <= row + 1; i++) {
-              for (let j = col - 1; j <= col + 1; j++) {
-                if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && (i !== row || j !== col)) {
-                  positions.push(`${i}-${j}`);
-                }
+      const getNeighborPositions = (position: string): string[] => {
+        const [row, col] = position.split('-').map(Number);
+        const positions = [];
+      
+        if (gridSize) {
+          const startRow = Math.max(0, row - 1);
+          const endRow = Math.min(gridSize - 1, row + 1);
+          const startCol = Math.max(0, col - 1);
+          const endCol = Math.min(gridSize - 1, col + 1);
+      
+          for (let i = startRow; i <= endRow; i++) {
+            for (let j = startCol; j <= endCol; j++) {
+              if (i !== row || j !== col) {
+                positions.push(`${i}-${j}`);
               }
             }
-      }
-    
-      return positions;
-    }
-
-    const flipNeighbors = (cell: any, newCellIds : cellIds[]) => {
-      const neighborPositions = getNeighborPositions(cell.position);
-      neighborPositions.forEach((position) => {
-        const neighborCell = newCellIds.find((item:cellIds) => item.position === position);
-        if (neighborCell && !neighborCell.revealed) {
-          neighborCell.revealed = true;
-          if (neighborCell.value === "0") {
-            flipNeighbors(neighborCell, newCellIds);
           }
         }
-      });
-    };
+      
+        return positions;
+      };      
+      
 
-    const setBombs = () => {
+      const flipNeighbors = (cell: any, newCellIds : cellIds[]) => {
+        const neighborPositions = getNeighborPositions(cell.position);
+        for (let i = 0; i < neighborPositions.length; i++) {
+          const position = neighborPositions[i];
+          const neighborCell = newCellIds.find((item: cellIds) => item.position === position);
+          if (neighborCell && !neighborCell.revealed) {
+            neighborCell.revealed = true;
+            if (neighborCell.value === "0") {
+              flipNeighbors(neighborCell, newCellIds);
+            }
+          }
+        }
+      };
+          
+
+      const setBombs = () => {
         if (gridSize && numBombs) {
-            let numBombsPlaced = 0;
-            let bombCellIds: string[] = [];
-        
-            while (numBombsPlaced < numBombs) {
+          let numBombsPlaced = 0;
+          let bombCellIds = new Set<string>();
+          
+          while (numBombsPlaced < numBombs) {
             let randomRow = Math.floor(Math.random() * gridSize);
             let randomCol = Math.floor(Math.random() * gridSize);
             let cellId = `${randomRow}-${randomCol}`;
-            if (!bombCellIds.includes(cellId)) {
-                bombCellIds.push(cellId);
-                numBombsPlaced++;
+            
+            if (!bombCellIds.has(cellId)) {
+              bombCellIds.add(cellId);
+              numBombsPlaced++;
             }
-            }
-            return bombCellIds;
+          }
+          
+          return Array.from(bombCellIds);
         }
-    }
+      }      
 
-    const setGrid = () => {
-        if(gridSize && numBombs){
-            let cellIds = [];
-            let bombCellIds = setBombs();
-            for (let i = 0; i < gridSize; i++) {
-                for (let j = 0; j < gridSize; j++) {
-                    let cellId = `${i}-${j}`;
-                    let count = 0
-                    for (let x = -1; x <= 1; x++) {
-                        for (let y = -1; y <= 1; y++) {
-                          if (bombCellIds!.includes(`${i + x}-${j + y}`)) count++;
-                        }
-                    }
-                    if(bombCellIds!.includes(cellId)){
-                        cellIds.push({position : cellId, value: "bomb", revealed : false, flag:false});
-                    }else{
-                        cellIds.push({position : cellId, value: `${count}`, revealed : false, flag:false});
-                    }
-                    
+      const setGrid = () => {
+        if (gridSize && numBombs) {
+          const bombCellIds = new Set(setBombs()); // Use a Set for faster lookups
+          const cellIds = [];
+      
+          for (let i = 0; i < gridSize; i++) {
+            for (let j = 0; j < gridSize; j++) {
+              const cellId = `${i}-${j}`;
+              const isBomb = bombCellIds.has(cellId); // Use Set.has() for faster lookups
+              let count = isBomb ? null : 0; // Initialize count to null if cell is a bomb
+      
+              if (!isBomb) {
+                // Count adjacent bombs using only valid coordinates
+                for (let x = Math.max(i - 1, 0); x <= Math.min(i + 1, gridSize - 1); x++) {
+                  for (let y = Math.max(j - 1, 0); y <= Math.min(j + 1, gridSize - 1); y++) {
+                    const adjacentId = `${x}-${y}`;
+                    if (bombCellIds.has(adjacentId)) count!++;
+                  }
                 }
+              }
+      
+              cellIds.push({ position: cellId, value: isBomb ? "bomb" : String(count), revealed: false, flag: false });
             }
-            setCellIds(cellIds);
+          }
+      
+          setCellIds(cellIds);
         }
-    }
+      };
+      
     function handleRightClickToDisplayFlag(event:any,cellId:string) {
       event.preventDefault();
       const cell = cellIds.find((item) => item.position === cellId);
@@ -183,28 +198,29 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
     }
       
     const renderGrid = () => {
-        let grid = [];
-        const cellClassColor = " bg-indigo-700"
-        var cellClassEmpty = "grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"
-        if(gridSize && numBombs){
-            for(let i = 0; i < cellIds.length; i ++){
-                let row = []
-                for(let j = 0 ; j < cellIds.length; j++){
-                    let cellId = `${i}-${j}`;
-                    var cell = cellIds.find(item => item.position === cellId);
-                    if(cell && cell.position){
-                        if(cell.value === "bomb"){
-                            row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
-                        } else {
-                            row.push(<div key={cell.position}  className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)} onClick={() => handleFlip(cellId)}> {!cell.flag? parseInt(cell.value) > 0 && cell.revealed ? cell.value : null:<img src={flag} alt="flag"  />}</div>);
-                        }
-                    }
-                }
-                grid.push(<div key={i} className="grid-row flex flex-row">{row}</div>)
+      let grid = [];
+      const cellClassColor = " bg-indigo-700"
+      var cellClassEmpty = "grid-cell flex flex-col h-10 w-10 border border-gray-400 rounded-md justify-center items-center"
+      if(gridSize && numBombs){
+        for(let i = 0; i < gridSize; i ++){
+          let row = []
+          for(let j = 0 ; j < gridSize; j++){
+            let cellId = `${i}-${j}`;
+            var cell = cellIds.find(item => item.position === cellId);
+            if(cell && cell.position){
+              if(cell.value === "bomb"){
+                row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
+              } else {
+                row.push(<div key={cell.position}  className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)} onClick={() => handleFlip(cellId)}> {!cell.flag? parseInt(cell.value) > 0 && cell.revealed ? cell.value : null:<img src={flag} alt="flag"  />}</div>);
+              }
             }
-            return grid;
+          }
+          grid.push(<div key={i} className="grid-row flex flex-row">{row}</div>)
         }
+        return grid;
+      }
     };
+    
       return <>
         {renderGrid()}
     </>
