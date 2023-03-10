@@ -56,8 +56,8 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
     <div className="grid place-content-center">
       <h1 className="text-center  font-black text-4xl">Minesweeper</h1>
       <div className="grid mb-10">
-        <div className="flex  justify-between items-center">
-          <div className="flex items-center">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center justify-between">
             <select value={difficulty} onChange={handleDifficultyChange} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 my-5">
               <option value={Difficulty.easy}>Easy (9x9, 10 bombs)</option>
               <option value={Difficulty.normal}>Normal (16x16, 40 bombs)</option>
