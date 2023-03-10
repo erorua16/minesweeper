@@ -11,7 +11,6 @@ const GetUsersInLocalStorage=()=>{
     if(userLevel){
      dispatch({ type: "SET_USER_LEVEL", payload: userLevel });
      }
-     console.log('he he')
   },[])  
 
 }

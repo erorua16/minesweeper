@@ -85,11 +85,9 @@ const LeaderBoard = ({
       ? JSON.parse(userWithLevel)
       : null;
     if (parsedUserWithLevel) {
-      console.log(parsedUserWithLevel.easy.length, "parsedUserWithLevel");
       let level = state.user.level;
       switch (level) {
         case Difficulty.easy:
-          console.log(state.user_level.easy.length, "parsedUserWithLevel easy");
           if (playingUSer.name.length > 0) {
             parsedUserWithLevel.easy.push(playingUSer);
             setItemAndDispatch(parsedUserWithLevel);
