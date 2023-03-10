@@ -47,9 +47,10 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
   };
 
   const startGame = () => {
-    if(difficulty){
+    if(difficulty !== Difficulty.default){
       setGameState(GameState.playing)
     }
+    console.log(gameState)
   }
   
   return <>

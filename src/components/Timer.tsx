@@ -19,9 +19,17 @@ const Timer = ({ finalTime,gameState}:TimerType) => {
         }
       }
     }, 1000);
-    if (finalTime) finalTime(seconds, minutes);
+    
     return () => clearInterval(interval);
   }, [minutes, seconds]);
+
+  React.useEffect(()=> {
+    if (finalTime) finalTime(seconds, minutes);
+    if(gameState === GameState.win || gameState === GameState.lose){
+      setMinutes(0)
+      setSeconds(0)
+    }
+  }, [gameState])
 
   return <>
     <div className="w-24 mx-1 p-2 bg-white text-indigo-700 rounded-lg">

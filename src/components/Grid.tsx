@@ -22,17 +22,21 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
     const [gridSize, setGridSize] = React.useState<number | null>();
     const [numBombs, setNumBombs] = React.useState<number | null>();
     const [cellIds, setCellIds] = React.useState<cellIds[]>([]);
-
+    const [makeGrid, setMakeGrid] = React.useState<boolean>(false);
 
     React.useEffect(() => {
+      if(gameState === GameState.playing){
+        setMakeGrid(true)
         setGridState()
-    }, [difficulty])
-
+      }
+    }, [gameState])
+    
     React.useEffect(()=>{
-        if(gridSize && numBombs){
-            setGrid()
+        if(makeGrid){
+          setGrid()
+          setMakeGrid(false)
         }
-    }, [gridSize])
+    }, [makeGrid])
 
     const setGridState = () => {
         switch (difficulty) {
@@ -84,35 +88,35 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
 
       };
       
-      const getNeighborPositions = (position: string): string[] => {
-        const [row, col] = position.split('-').map(Number);
-        const positions = [];
-      
-        if(gridSize){
-            for (let i = row - 1; i <= row + 1; i++) {
-                for (let j = col - 1; j <= col + 1; j++) {
-                  if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && (i !== row || j !== col)) {
-                    positions.push(`${i}-${j}`);
-                  }
+    const getNeighborPositions = (position: string): string[] => {
+      const [row, col] = position.split('-').map(Number);
+      const positions = [];
+    
+      if(gridSize){
+          for (let i = row - 1; i <= row + 1; i++) {
+              for (let j = col - 1; j <= col + 1; j++) {
+                if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && (i !== row || j !== col)) {
+                  positions.push(`${i}-${j}`);
                 }
               }
-        }
-      
-        return positions;
-      }
-
-      const flipNeighbors = (cell: any, newCellIds : cellIds[]) => {
-        const neighborPositions = getNeighborPositions(cell.position);
-        neighborPositions.forEach((position) => {
-          const neighborCell = newCellIds.find((item:cellIds) => item.position === position);
-          if (neighborCell && !neighborCell.revealed) {
-            neighborCell.revealed = true;
-            if (neighborCell.value === "0") {
-              flipNeighbors(neighborCell, newCellIds);
             }
+      }
+    
+      return positions;
+    }
+
+    const flipNeighbors = (cell: any, newCellIds : cellIds[]) => {
+      const neighborPositions = getNeighborPositions(cell.position);
+      neighborPositions.forEach((position) => {
+        const neighborCell = newCellIds.find((item:cellIds) => item.position === position);
+        if (neighborCell && !neighborCell.revealed) {
+          neighborCell.revealed = true;
+          if (neighborCell.value === "0") {
+            flipNeighbors(neighborCell, newCellIds);
           }
-        });
-      };
+        }
+      });
+    };
 
     const setBombs = () => {
         if (gridSize && numBombs) {
