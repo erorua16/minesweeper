@@ -25,18 +25,19 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
     const [makeGrid, setMakeGrid] = React.useState<boolean>(false);
 
     React.useEffect(() => {
-      if(gameState === GameState.playing){
-        setMakeGrid(true)
-        setGridState()
+      if (gameState === GameState.playing) {
+        setGridState();
+        setMakeGrid(true);
       }
-    }, [setGameState])
+    }, [gameState]);
     
-    React.useEffect(()=>{
-        if(makeGrid){
-          setGrid()
-          setMakeGrid(false)
-        }
-    }, [setMakeGrid, gridSize, numBombs])
+    React.useEffect(() => {
+      if (makeGrid) {
+        setGrid();
+        setMakeGrid(false);
+      }
+    }, [makeGrid, difficulty, gameState]);
+    
 
     const setGridState = () => {
         switch (difficulty) {
@@ -210,7 +211,7 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
             var cell = cellIds.find(item => item.position === cellId);
             if(cell && cell.position){
               if(cell.value === "bomb"){
-                row.push(<div key={cell.position} className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
+                row.push(<div key={cell.position} className={cellClassEmpty } onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)}  onClick={() => handleFlip(cellId)}>{!cell.flag ? cell.revealed ? <i className="fa-solid fa-bomb"></i> : null :<img src={flag} alt="flag"  /> }  </div>);
               } else {
                 row.push(<div key={cell.position}  className={cell.revealed ? cellClassEmpty : cellClassEmpty + cellClassColor} onContextMenu={(e)=> handleRightClickToDisplayFlag(e,cellId)} onClick={() => handleFlip(cellId)}> {!cell.flag? parseInt(cell.value) > 0 && cell.revealed ? cell.value : null:<img src={flag} alt="flag"  />}</div>);
               }

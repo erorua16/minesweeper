@@ -50,7 +50,9 @@ const Board = ({DifficultyContext}:any) : React.ReactElement => {
     if(difficulty !== Difficulty.default){
       setGameState(GameState.playing)
     }
-    console.log(gameState)
+    else {
+      setGameState(GameState.notPlaying)
+    }
   }
   
   return <>
