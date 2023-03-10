@@ -194,7 +194,6 @@ const Grid : React.FC<GridType> = ({ difficulty, gameState, setGameState } : Gri
     }
     const checkIfUserWin=()=>{
      const restOfBombs = cellIds.filter((item)=>item.revealed===false)
-     setGameState(GameState.win)  
      if(numBombs && restOfBombs.length === numBombs)
         setGameState(GameState.win)  
     }
