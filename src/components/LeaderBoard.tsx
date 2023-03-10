@@ -126,7 +126,7 @@ const LeaderBoard = ({
   return (
     <>
       <div className="flex flex-col">
-        <h1 className="text-2xl font-semibold	">
+        <h1 className="text-2xl font-semibold	mt-10 text-center">
           Select the level of Leader board
         </h1>
         <div>
