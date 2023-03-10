@@ -36,24 +36,31 @@ const LeaderBoard = ({
     level: defaultDifficulty,
   };
  
-  const handleLevelChange = (event: any) => {
-    const value = event.target.value;
+  const handleLevelChange = (event: any,f=false) => {
+    let value = !f ? event.target.value:event;
     switch (value) {
       case Difficulty.easy:
         const easy: any = state.user_level.easy;
         setPlayerList(easy);
+        setLevel(Difficulty.easy);
         break;
       case Difficulty.normal:
         const normal: any = state.user_level.normal;
         setPlayerList(normal);
+        setLevel(Difficulty.normal);
+
         break;
       case Difficulty.medium:
         const medium: any = state.user_level.medium;
         setPlayerList(medium);
+        setLevel(Difficulty.medium);
+
         break;
       case Difficulty.hard:
         const hard: any = state.user_level.hard;
         setPlayerList(hard);
+        setLevel(Difficulty.hard);
+
         break;
       default:
         setLevel(Difficulty.default);
@@ -67,7 +74,7 @@ const LeaderBoard = ({
 
   const addUserInLocalStorage = () => {
     let userWithLevel: any = localStorage.getItem("minesweeper");
-    let parsedUserWithLevel = JSON.parse(userWithLevel)
+    var parsedUserWithLevel = JSON.parse(userWithLevel)
       ? JSON.parse(userWithLevel)
       : null;
     if (parsedUserWithLevel) {
@@ -101,6 +108,8 @@ const LeaderBoard = ({
       }
     }
   };
+  
+  console.log(defaultDifficulty,"defaultDifficulty")
   React.useEffect(() => {
     if (gameState === GameState.win) {
       dispatch({ type: "SET_USER", payload: playingUSer });
@@ -111,6 +120,10 @@ const LeaderBoard = ({
     addUserInLocalStorage();
   }, [userName]);
 
+  React.useEffect(() => {
+    handleLevelChange(defaultDifficulty,true)
+  }, [defaultDifficulty,state.user_level]);
+
   return (
     <>
       <div className="flex flex-col">
@@ -120,7 +133,7 @@ const LeaderBoard = ({
         <div>
           <select
             value={level}
-            defaultValue={defaultDifficulty}
+            defaultValue={Difficulty.easy}
             onChange={handleLevelChange}
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 my-5"
           >
